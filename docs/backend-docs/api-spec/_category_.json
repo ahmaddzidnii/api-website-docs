@@ -1,0 +1,8 @@
+{
+  "label": "API Specification",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Dokumentasi lengkap Backend SCIT Website meliputi API Specification, Database Schema, Authentication & Authorization, Error Handling, dan Best Practices dalam pengembangan REST API."
+  }
+}
