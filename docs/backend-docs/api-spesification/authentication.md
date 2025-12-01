@@ -101,7 +101,7 @@ Jika request menyertakan **kedua metode** (cookie dan Bearer token), server akan
 
 # 3. API Endpoints
 
-### **POST /auth/login**
+### **POST /auth/signin**
 
 **Description:** Login user dan menghasilkan Access & Refresh Token.
 
@@ -109,8 +109,8 @@ Jika request menyertakan **kedua metode** (cookie dan Bearer token), server akan
 
 ```json
 {
-  "email": "string",
-  "password": "string"
+  "username": "username",
+  "password": "password"
 }
 ```
 
@@ -125,30 +125,11 @@ Jika request menyertakan **kedua metode** (cookie dan Bearer token), server akan
 
 ```json
 {
-  "status": "success",
+  "statusCode": 201,
+  "message": "User loggedin successfully",
   "data": {
-    "userId": "string",
-    "email": "string",
-    "role": "string"
-  }
-}
-```
-
-**Response (Bearer Token mode):**
-
-Jika client mengirimkan header `X-Auth-Mode: bearer`, server akan mengembalikan token dalam response body:
-
-```json
-{
-  "status": "success",
-  "data": {
-    "userId": "string",
-    "email": "string",
-    "role": "string",
-    "accessToken": "string",
-    "refreshToken": "string",
-    "accessTokenExpiresIn": 900,
-    "refreshTokenExpiresIn": 604800
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYWddd1lIjoiYWRtaW4iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjQ1ODI4MDYsImV4cCI6MTc2NDU4MzcwNn0.Ko3Mz9pFWIlawgLpa47mHWdtZfGpVO_q6HvwW65C25k",
+    "refreshToken": "eyJhbGciOiJIUzI1ddNiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3NjQ1ODI4MDYsImV4cCI6MTc2NTdE4NzYwNn0.q7eC7ezxImN3Z4zdM2VwIt9bzGy7LefGPGVPDMoewkAE"
   }
 }
 ```
@@ -165,63 +146,50 @@ Tidak perlu request body. Server akan membaca `refreshToken` dari cookie secara 
 
 **Request (Bearer Token mode):**
 
-```json
-{
-  "refreshToken": "string"
-}
+Header:
+
+```http
+Authorization: Bearer <refreshToken>
 ```
 
 **Response (Cookie-based):**
 
-- **Set-Cookie:** `accessToken` baru
-
 ```json
 {
-  "status": "success",
+  "statusCode": 200,
+  "message": "Tokens refreshed successfully",
   "data": {
-    "accessTokenExpiresIn": 900
-  }
-}
-```
-
-**Response (Bearer Token mode):**
-
-```json
-{
-  "status": "success",
-  "data": {
-    "accessToken": "string",
-    "accessTokenExpiresIn": 900
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiQURNSU4iLCJpYXQgiOjE3NjQ1ODI5MzjgsImV4cCI6MTc2NDU4MzgzOH0.qObHvt9qkTNrymYtG92hkOQNZFL_gARKgrSZPmwHYcM",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsIdnR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3NjQ1ODI5fMzgsImV4cCI6MTc2NTE4NzczOH0.sFHWVhF3p7kNZMfzUuTXfSu4gTF2vJcAWRlMFyzpoQs"
   }
 }
 ```
 
 ---
 
-### **POST /auth/logout**
+### **POST /auth/signout**
 
 **Description:** Menghapus sesi user dan invalidasi refresh token.
 
 **Request (Cookie-based):**
 
-Tidak perlu request body. Server akan membaca token dari cookie dan menghapusnya.
+Tidak perlu request header. Server akan membaca token dari cookie dan menghapusnya.
 
 **Request (Bearer Token mode):**
 
-Header: `Authorization: Bearer <accessToken>`
+Header:
 
-```json
-{
-  "refreshToken": "string"
-}
+```http
+Authorization: Bearer <refreshToken>
 ```
 
 **Response:**
 
 ```json
 {
-  "status": "success",
-  "message": "Logged out successfully"
+  "statusCode": 200,
+  "message": "Logged out successfully",
+  "data": null
 }
 ```
 
@@ -229,3 +197,39 @@ Header: `Authorization: Bearer <accessToken>`
 
 - Untuk cookie-based, server akan mengirimkan instruksi `Set-Cookie` untuk menghapus cookie.
 - Untuk bearer token, client bertanggung jawab menghapus token dari storage setelah menerima response sukses.
+
+### **GET /auth/session**
+
+**Description:** Mendapatkan informasi sesi user yang sedang aktif (cek status login).
+
+**Request (Cookie-based):**
+
+Tidak perlu request header. Server akan membaca token dari cookie.
+
+**Request (Bearer Token mode):**
+
+Header:
+
+```http
+Authorization: Bearer <accessToken>
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 200,
+  "message": "Success",
+  "data": {
+    "userId": 1,
+    "name": "Administrator",
+    "username": "admin",
+    "role": "ADMIN"
+  }
+}
+```
+
+**Note:**
+
+- Untuk cookie-based, server akan membaca token dari cookie.
+- Untuk bearer token, client mengirimkan access token di header Authorization.

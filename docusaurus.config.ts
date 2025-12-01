@@ -57,7 +57,7 @@ const config: Config = {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
     colorMode: {
-      respectPrefersColorScheme: true,
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: "SCIT Website Documentation",
@@ -67,8 +67,9 @@ const config: Config = {
       },
       items: [
         {
-          href: "https://github.com/facebook/docusaurus",
-          label: "GitHub",
+          href: "https://github.com/scituinsk",
+          className: "header-github-link",
+          "aria-label": "GitHub repository",
           position: "right",
         },
       ],
