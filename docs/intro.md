@@ -69,5 +69,3 @@ Website SCIT ditujukan untuk:
 ## **Kesimpulan**
 
 Website SCIT UIN Sunan Kalijaga bukan hanya sekadar portal informasi, tetapi juga merupakan pusat dokumentasi digital yang membantu komunitas dalam menampilkan karya, mengelola konten, dan memperkuat branding komunitas IT di lingkungan kampus. Dengan arsitektur modern dan sistem manajemen konten yang fleksibel, website ini mendukung kebutuhan kolaborasi dan publikasi yang dinamis.
-
----
