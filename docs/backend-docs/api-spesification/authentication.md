@@ -46,8 +46,10 @@ Sistem dirancang untuk mendukung fleksibilitas akses pengguna dan pembatasan fit
 - **Multi-Session Support:**
   - Satu akun user diizinkan memiliki **banyak sesi aktif** secara bersamaan.
 - **Role-Based Access Control:**
-  - **Role `USER`:** Memiliki otoritas penuh untuk mengelola seluruh _resource_ aplikasi (CRUD data operasional), **KECUALI** modul "Manajemen User" (menambah/menghapus admin atau user lain).
-  - **Role `ADMIN`:** Memiliki otoritas penuh untuk mengelola seluruh _resource_ aplikasi.
+  - Sistem mendukung tiga level peran: `SUPER_ADMIN`, `ADMIN`, dan `USER`.
+  - **Role `USER`:** Digunakan kapan kapan tapi belum sekarang, yang penting ada dulu.
+  - **Role `ADMIN`:** Memiliki otoritas luas untuk mengelola sebagian besar resource aplikasi, termasuk modul "Manajemen User" untuk menambah/menghapus user biasa dan mengelola konten; namun memiliki batasan pada operasi tingkat sistem yang sangat sensitif (mis. perubahan konfigurasi global atau pengelolaan `SUPER_ADMIN`).
+  - **Role `SUPER_ADMIN`:** Memiliki otoritas tertinggi dan dapat mengelola semua resource termasuk pembuatan/penghapusan admin lain, perubahan konfigurasi global, dan operasi sensitif lainnya.
 
 ### Mekanisme Token
 
@@ -133,6 +135,10 @@ Jika request menyertakan **kedua metode** (cookie dan Bearer token), server akan
   }
 }
 ```
+
+:::info
+Untuk **attibut user** yang harus ada di dalam database silahkan lihat dokumentasi [User Management API](./user-management.md).
+:::
 
 ---
 

@@ -46,15 +46,13 @@ Format error respons yang digunakan secara konsisten.
 
 ```json
 {
-  "status": "success",
-  "data": {
-    "items": [],
-    "pagination": {
-      "page": 1,
-      "perpage": 10,
-      "total": 5,
-      "totalPages": 42
-    }
+  "statusCode": 200,
+  "message": "Success",
+  "pagination": {
+    "page": 1,
+    "perpage": 10,
+    "total": 5,
+    "totalPages": 42
   }
 }
 ```

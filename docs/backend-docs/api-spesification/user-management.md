@@ -6,226 +6,83 @@ sidebar_position: 3
 
 ## 1. Overview
 
-Berisi ringkasan singkat mengenai tujuan API, sistem yang terlibat, serta gambaran besar fungsionalitas.
+Modul Manajemen User menyediakan API untuk mengelola user dalam sistem, termasuk pembuatan, pembaruan, penghapusan, dan pengambilan data user. Modul ini mendukung fitur autentikasi dan otorisasi berbasis peran (RBAC) untuk memastikan keamanan dan kontrol akses yang tepat.
 
 **Contoh isi:**
 
-- API ini digunakan untuk …
-- Sistem yang berkomunikasi: …
-- Format respons standar: JSON
+- Endpoint untuk manajemen user
+- Fitur CRUD untuk user
+- Format request dan response menggunakan standar global response dan format JSON.
 
 ---
 
 ## 2. Authentication
 
-Jelaskan metode autentikasi yang digunakan.
+Modul ini memerlukan autentikasi menggunakan token JWT yang diperoleh dari modul Authentication. Setiap permintaan ke endpoint manajemen user harus menyertakan token ini di header Authorization.
 
-**Termasuk:**
+```http
+Authorization: Bearer <accessToken>
+```
 
-- Jenis auth (JWT / OAuth2 / API Key / Cookie-based)
-- Mekanisme token (expiration, refresh)
-- Header atau cookie yang harus dikirim
+:::tip
 
-**Contoh:**
+jika anda menggunakan metode authentikasi dengan`cookie` token akan dikirim browser secara otomatis.
 
-- Access Token dikirim via cookie `accessToken`
-- Refresh Token dikirim via cookie `refreshToken`
-- Expiration: Access Token 15 menit, Refresh Token 7 hari
+:::
 
 ---
 
-## 3. Base URL
+## 3. API Endpoints
 
-```txt
-https://api.example.com/v1
-```
+:::warning
+**Catatan Penting:**
 
----
+- Hanya user dengan peran `SUPER_ADMIN` yang dapat mengakses endpoint ini.
+- Pastikan untuk menyertakan token autentikasi yang valid pada setiap permintaan.
+- Semua respons mengikuti format respons global yang telah ditentukan.
+  :::
 
-## 4. Error Handling Standard
-
-Format error respons yang digunakan secara konsisten.
-
-**Response Structure:**
-
-```json
-{
-  "status": "error",
-  "message": "Deskripsi error",
-  "code": "ERROR_CODE"
-}
-```
-
-**Contoh Error Code:**
-
-- `AUTH_INVALID_TOKEN`
-- `VALIDATION_ERROR`
-- `RESOURCE_NOT_FOUND`
-- `SERVER_ERROR`
+:::info
+Untuk mengenai **role** silahkan lihat dokumentasi [RBAC](./authentication#manajemen-sesi--hak-akses-rbac).
+:::
 
 ---
 
-## 5. Global Response Format
+### **POST /users**
 
-### **Success Response**
+**Description:** Membuat user baru.
 
-```json
-{
-  "status": "success",
-  "data": {}
-}
-```
-
-### **Paginated Response**
-
-```json
-{
-  "status": "success",
-  "data": {
-    "items": [],
-    "pagination": {
-      "page": 1,
-      "pageSize": 10,
-      "totalPages": 5,
-      "totalItems": 42
-    }
-  }
-}
-```
-
----
-
-# 6. API Endpoints
-
-## 6.1. Authentication Module
-
-### **POST /auth/login**
-
-**Description:** Login user dan menghasilkan Access & Refresh Token.
+**Authentication:** Required (roles: `ADMIN`, `SUPER_ADMIN`)
 
 **Request Body:**
 
 ```json
 {
-  "email": "string",
-  "password": "string"
-}
-```
-
-**Response:**
-
-- Cookie:
-
-  - `accessToken`
-  - `refreshToken`
-
-- Body:
-
-```json
-{
-  "status": "success",
-  "data": {
-    "userId": "string",
-    "email": "string"
-  }
-}
-```
-
----
-
-### **POST /auth/refresh**
-
-**Description:** Menghasilkan Access Token baru menggunakan Refresh Token.
-
-**Response:**
-
-- Cookie baru: `accessToken`
-
-```json
-{
-  "status": "success",
-  "data": {
-    "accessTokenExpiresIn": 900
-  }
-}
-```
-
----
-
-### **POST /auth/logout**
-
-**Description:** Menghapus sesi user.
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "message": "Logged out"
-}
-```
-
----
-
-## 6.2. User Module
-
-### **GET /users**
-
-**Description:** List semua user (admin only).
-
-**Query Params:**
-
-- `page` (optional)
-- `pageSize` (optional)
-
-**Response:** _(paginated)_
-
-```json
-{
-  "status": "success",
-  "data": {
-    "items": [
-      {
-        "id": "string",
-        "name": "string",
-        "email": "string",
-        "role": "string"
-      }
-    ],
-    "pagination": {
-      "page": 1,
-      "pageSize": 10,
-      "totalPages": 3,
-      "totalItems": 25
-    }
-  }
-}
-```
-
----
-
-## 6.3. Resource Module (Contoh Generic)
-
-### **POST /resources**
-
-**Description:** Membuat resource baru.
-
-**Request Body Example:**
-
-```json
-{
   "name": "string",
-  "value": "string"
+  "username": "string",
+  "email": "user@example.com",
+  "password": "string",
+  "role": "USER" // optional: USER | ADMIN | SUPER_ADMIN (subject to RBAC)
 }
 ```
 
-**Response:**
+:::info
+
+- `username` harus unik di seluruh sistem.
+- `email` harus valid dan unik.
+- `password` harus memenuhi kebijakan keamanan (misalnya minimal 8 karakter, kombinasi huruf besar, huruf kecil, angka, dan simbol).
+  :::
+
+**Response (201 Created):**
 
 ```json
 {
   "status": "success",
   "data": {
     "id": "string",
+    "name": "string",
+    "email": "user@example.com",
+    "role": "USER",
     "createdAt": "2024-01-01T00:00:00Z"
   }
 }
@@ -233,53 +90,89 @@ Format error respons yang digunakan secara konsisten.
 
 ---
 
-# 7. Data Models
+### **GET /users**
 
-## **User**
+**Description:** Mengambil daftar user (paginated).
 
-| Field | Type   | Description       |
-| ----- | ------ | ----------------- |
-| id    | string | Unique ID         |
-| name  | string | Full name         |
-| email | string | User email        |
-| role  | string | Role-based access |
+**Authentication:** Required (roles: `ADMIN`, `SUPER_ADMIN`)
 
----
+**Query Params:**
 
-# 8. Role & Permission Matrix
+- `page` (optional)
+- `pageSize` (optional)
+- `q` (optional) — search by name/email
+- `role` (optional) — filter by role
 
-| Role  | Permission                                         |
-| ----- | -------------------------------------------------- |
-| Admin | Manage users, manage all resources                 |
-| User  | Manage all resource modules except user management |
-
----
-
-# 9. Rate Limiting
-
-- **100 requests/min per IP**
-- Error response jika limit terlampaui:
+**Response (200):** _(paginated)_
 
 ```json
 {
-  "status": "error",
-  "message": "Rate limit exceeded",
-  "code": "RATE_LIMIT"
+  "status": "success",
+  "data": [
+    {
+      "id": "string",
+      "name": "string",
+      "email": "string",
+      "role": "string",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 3,
+    "totalItems": 25
+  }
 }
 ```
 
 ---
 
-# 10. Versioning
+### PATCH `/users/{id}` (untuk partial update)
 
-- Semua endpoint berada di bawah prefix `/v1`
-- Perubahan breaking akan dirilis pada `/v2`
+**Description:** Memperbarui data user.
+
+**Authentication:** Required (roles: `ADMIN`, `SUPER_ADMIN`, or the user themself for profile updates)
+
+**Request Body (contoh):**
+
+```json
+{
+  "name": "string",
+  "email": "user@example.com",
+  "password": "string", // optional untuk ganti password
+  "role": "ADMIN" // only allowed for ADMIN/SUPER_ADMIN depending on RBAC
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "string",
+    "name": "string",
+    "email": "user@example.com",
+    "role": "ADMIN",
+    "updatedAt": "2024-01-02T00:00:00Z"
+  }
+}
+```
 
 ---
 
-# Jika mau, saya bisa:
+### DELETE `/users/{id}`
 
-✅ Buatkan versi yang lebih detail
-✅ Buatkan versi khusus Postman Collection
-✅ Buatkan versi OpenAPI 3.0 (YAML/JSON)
-Cukup bilang _“buatkan versi openapi”_ atau _“buatkan dokumentasi lebih lengkap”_
+**Description:** Menghapus user.
+
+**Authentication:** Required (roles: `SUPER_ADMIN`).
+
+**Response (200):**
+
+```json
+{
+  "status": "success",
+  "data": null
+}
+```
